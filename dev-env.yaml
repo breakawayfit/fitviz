@@ -1,0 +1,19 @@
+name: dev
+dependencies:
+  - altair
+  - altair_viewer
+  - black
+  - blas=*=mkl
+  - jupyterlab
+  - numpy
+  - pandas
+  - pip
+  - pylint
+  - pyspark
+  - pytest
+  - python=3.7
+  - mypy
+  - scikit-learn
+  - pip:
+      - streamlit
+      - nb_black
