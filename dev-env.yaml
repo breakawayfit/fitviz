@@ -1,4 +1,7 @@
-name: dev
+name: fitviz
+channels:
+  - conda-forge
+  - defaults
 dependencies:
   - altair
   - altair_viewer
@@ -17,3 +20,4 @@ dependencies:
   - pip:
       - streamlit
       - nb_black
+      - '--editable .'
