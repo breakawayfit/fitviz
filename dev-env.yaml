@@ -18,6 +18,7 @@ dependencies:
   - mypy
   - scikit-learn
   - pip:
+      - fitdecode
       - streamlit
       - nb_black
       - '--editable .'

@@ -1,8 +1,10 @@
 import datetime
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, List
 
 import pandas as pd
+
+HR_ZONE_PCT = {1: 0.7, 2: 0.87, 3: 0.95, 4: 1, 4.5: 1.05}
 
 
 @dataclass
@@ -22,19 +24,23 @@ class Athlete:
             columns=("metric", "power"),
         )
 
-    def get_hr_zone(self, hr: float) -> float:
-        zone = 0.0
+    def get_hr_zones(self):
+        assert self.lthr is not None
+        return [self.lthr * pct for pct in HR_ZONE_PCT.values()]
+
+    def get_hr_zone(self, hr: float) -> Optional[float]:
+        zone = None
         if self.lthr is not None:
             hr_norm = hr / self.lthr
-            if hr_norm < 0.7:
+            if hr_norm < HR_ZONE_PCT[1]:
                 zone = 1.0
-            elif hr_norm < 0.87:
+            elif hr_norm < HR_ZONE_PCT[2]:
                 zone = 2.0
-            elif hr_norm < 0.95:
+            elif hr_norm < HR_ZONE_PCT[3]:
                 zone = 3.0
-            elif hr_norm < 1:
+            elif hr_norm < HR_ZONE_PCT[4]:
                 zone = 4.0
-            elif hr_norm < 1.05:
+            elif hr_norm < HR_ZONE_PCT[4.5]:
                 zone = 4.5
             else:
                 zone = 5.0
