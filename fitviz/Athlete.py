@@ -5,6 +5,7 @@ from typing import Optional, List
 import pandas as pd
 
 HR_ZONE_PCT = {1: 0.7, 2: 0.87, 3: 0.95, 4: 1, 4.5: 1.05}
+PWR_ZONE_PCT = {1: 0.55, 2: 0.75, 3: 0.91, 4: 1, 4.5: 1.10, 5: 1.35}
 
 
 @dataclass
@@ -69,3 +70,7 @@ class Athlete:
             else:
                 zone = 6.0
         return zone
+
+    def get_basic_pwr_zone(self):
+        assert self.ftp is not None
+        return [self.ftp * pct for pct in PWR_ZONE_PCT.values()]
