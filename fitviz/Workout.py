@@ -9,7 +9,7 @@ from .PdxFile import PwxFile
 
 
 class Workout:
-    def __init__(self, pwx_path: str, athlete: Athlete = Athlete()):
+    def __init__(self, pwx_path: str, athlete: Athlete):
         pwx_file = PwxFile(pwx_path)
         self.athlete = athlete
         self.athlete_name: Optional[str] = pwx_file.athlete_name
@@ -77,7 +77,8 @@ class Workout:
                 x=x_encoding,
                 y=alt.Y("power:Q", axis=alt.Axis(title="Power (W)")),
                 color=alt.Color(
-                    "power_zone:N", scale=alt.Scale(range=pwr_zone_scheme),
+                    "power_zone:N",
+                    scale=alt.Scale(range=pwr_zone_scheme),
                 ),
             )
             .properties(width=width, height=height, title=self.title)
@@ -89,7 +90,9 @@ class Workout:
         four_dp_rules = (
             alt.Chart(metrics[((metrics.power * 0.80) < max_power)])
             .mark_rule()
-            .encode(y=alt.Y("power:Q", axis=alt.Axis(title="Power (W)")),)
+            .encode(
+                y=alt.Y("power:Q", axis=alt.Axis(title="Power (W)")),
+            )
         )
 
         hr = (

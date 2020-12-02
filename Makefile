@@ -19,8 +19,10 @@ dev:
 	@conda env create -f $(DEV_ENV_FILE)
 
 pyspark:
-	@$(DEV) $(SPARK_ENV) ; pyspark --packages com.databricks:spark-xml_2.11:0.9.0
-
+	@$(DEV) $(SPARK_ENV) ; pyspark  \
+	--packages io.delta:delta-core_2.12:0.7.0,org.apache.hadoop:hadoop-aws:2.7.7 \
+	--conf spark.delta.logStore.class=org.apache.spark.sql.delta.storage.S3SingleDriverLogStore \
+	
 pyspark-nb:
 	@$(DEV) $(SPARK_ENV) ; export PYSPARK_DRIVER_PYTHON_OPTS='notebook' ; pyspark
 

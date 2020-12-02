@@ -4,21 +4,26 @@ channels:
   - defaults
 dependencies:
   - altair
-  - altair_viewer
   - black
   - blas=*=mkl
   - jupyterlab
+  - loguru
   - numpy
+  - openjdk
   - pandas
   - pip
+  - pyarrow
   - pylint
   - pyspark
   - pytest
-  - python=3.7
+  - python=3.8
   - mypy
+  - nodejs
   - scikit-learn
+  - tabulate
+  - xlrd
   - pip:
-      - fitdecode
-      - streamlit
+      - awscli
       - nb_black
+      - streamlit
       - '--editable .'

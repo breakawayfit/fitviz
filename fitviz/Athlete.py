@@ -1,15 +1,36 @@
 import datetime
+from collections import namedtuple
 from dataclasses import dataclass
 from typing import Optional, List
 
+import numpy as np
 import pandas as pd
 
+
+@dataclass
+class Zone:
+    name: str
+    number: str
+    rpe: float
+    ftp_perc_bound: float
+    lthr_perc_bound: Optional[float]
+
+
 HR_ZONE_PCT = {1: 0.7, 2: 0.87, 3: 0.95, 4: 1, 4.5: 1.05}
-PWR_ZONE_PCT = {1: 0.55, 2: 0.75, 3: 0.91, 4: 1, 4.5: 1.10, 5: 1.35}
+PWR_ZONE_META: List[Zone] = [
+    Zone("Active Recovery", "1", 2.5, 0.55, 0.7),
+    Zone("Endurance", "2", 4.5, 0.75, 0.87),
+    Zone("Tempo", "3", 6, 0.91, 0.95),
+    Zone("Sub Threshold", "4a", 7, 1.0, 1.0),
+    Zone("Supra Threshold", "4b", 8.0, 1.10, 1.05),
+    Zone("VO2 Max", "5", 9.0, 1.35, np.inf),
+    Zone("AC/NM", "6", 10.0, np.inf, None),
+]
 
 
 @dataclass
 class Athlete:
+    database_root: str
     name: str = "John Donich"
     ftp: Optional[float] = None
     map: Optional[float] = None
@@ -18,6 +39,9 @@ class Athlete:
     lthr: Optional[float] = None
     test_date: Optional[datetime.date] = None
     end_date: Optional[datetime.date] = None
+
+    def __str__(self):
+        return self.get_zones_str()
 
     def four_dp(self) -> pd.DataFrame:
         return pd.DataFrame(
@@ -71,6 +95,43 @@ class Athlete:
                 zone = 6.0
         return zone
 
-    def get_basic_pwr_zone(self):
+    def get_zones_str(self):
+        return self.get_zones_df().to_markdown()
+
+    def get_zones_df(self) -> pd.DataFrame:
         assert self.ftp is not None
-        return [self.ftp * pct for pct in PWR_ZONE_PCT.values()]
+        assert self.lthr is not None
+        pwr_lower_bound = 0
+        hr_lower_bound = 0
+        columns = (
+            "zone_name",
+            "zone_number",
+            "low_power",
+            "high_power",
+            "low_hr",
+            "high_hr",
+        )
+        data = []
+        for zone in PWR_ZONE_META:
+            pwr_upper_bound = np.round(self.ftp * zone.ftp_perc_bound)
+            if zone.lthr_perc_bound is not None:
+                hr_upper_bound = np.round(self.lthr * zone.lthr_perc_bound)
+            else:
+                hr_lower_bound = np.nan
+                hr_upper_bound = np.nan
+
+            data.append(
+                (
+                    zone.name,
+                    zone.number,
+                    pwr_lower_bound,
+                    pwr_upper_bound,
+                    hr_lower_bound,
+                    hr_upper_bound,
+                )
+            )
+
+            pwr_lower_bound = pwr_upper_bound + 1
+            hr_lower_bound = hr_upper_bound + 1 if hr_upper_bound is not None else None
+
+        return pd.DataFrame(data, columns=columns)
